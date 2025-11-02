@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Environment-based API configuration
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:3001';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://eventhub-backend-xv3i.onrender.com';
+export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'https://eventhub-backend-xv3i.onrender.com';
 
 // Create axios instance with base configuration
 export const api = axios.create({
