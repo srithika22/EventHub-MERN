@@ -30,7 +30,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   process.env.FRONTEND_URL,
-  'https://eventhub-mern.vercel.app' // Your actual Vercel domain
+  'https://eventhub-mern.vercel.app', // Your main Vercel domain
+  'https://eventhub-mern-dphu8rj04-rithikas-projects-4d46ea67.vercel.app' // New deployment URL
 ];
 
 app.use(cors({
@@ -38,7 +39,8 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.includes(origin)) {
+    // Check if origin is in allowed list or matches Vercel pattern
+    if (allowedOrigins.includes(origin) || (origin && origin.includes('vercel.app'))) {
       return callback(null, true);
     }
     
