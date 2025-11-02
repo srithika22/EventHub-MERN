@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../utils/api';
 import './EventManagementCard.css';
 
 const EventManagementCard = ({ event, onEventUpdated, onEventDeleted }) => {
@@ -41,7 +42,7 @@ const EventManagementCard = ({ event, onEventUpdated, onEventDeleted }) => {
             const token = localStorage.getItem('token');
             const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
-            const response = await fetch(`http://localhost:3001/api/events/${event._id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/events/${event._id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -70,7 +71,7 @@ const EventManagementCard = ({ event, onEventUpdated, onEventDeleted }) => {
             const token = localStorage.getItem('token');
             const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
-            const response = await fetch(`http://localhost:3001/api/events/${event._id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/events/${event._id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': authHeader }
             });
@@ -109,7 +110,7 @@ const EventManagementCard = ({ event, onEventUpdated, onEventDeleted }) => {
             const token = localStorage.getItem('token');
             const authHeader = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
             
-            const response = await fetch(`http://localhost:3001/api/events/${eventId}/certificate-preview`, {
+            const response = await fetch(`${API_BASE_URL}/api/events/${eventId}/certificate-preview`, {
                 headers: { 'Authorization': authHeader }
             });
             

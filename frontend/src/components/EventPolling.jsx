@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/api';
 import './EventPolling.css';
 
 const EventPolling = () => {
@@ -36,7 +37,7 @@ const EventPolling = () => {
   const fetchPolls = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -58,7 +59,7 @@ const EventPolling = () => {
   const fetchActivePolls = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/active`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/active`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -77,7 +78,7 @@ const EventPolling = () => {
   const checkUserRole = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -108,7 +109,7 @@ const EventPolling = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -142,7 +143,7 @@ const EventPolling = () => {
   const handleVote = async (pollId, selectedOptions) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls/${pollId}/vote`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls/${pollId}/vote`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -178,7 +179,7 @@ const EventPolling = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls/${pollId}/${activate ? 'activate' : 'deactivate'}`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls/${pollId}/${activate ? 'activate' : 'deactivate'}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../utils/api';
 import './ParticipantManager.css';
 
 const ParticipantManager = ({ eventId, eventTitle, refreshTrigger = 0 }) => {
@@ -20,7 +21,7 @@ const ParticipantManager = ({ eventId, eventTitle, refreshTrigger = 0 }) => {
             const token = localStorage.getItem('token');
             const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
             
-            const response = await fetch(`http://localhost:3001/api/registrations/event/${eventId}/participants`, {
+            const response = await fetch(`${API_BASE_URL}/api/registrations/event/${eventId}/participants`, {
                 headers: { 'Authorization': authHeader }
             });
             
@@ -72,7 +73,7 @@ const ParticipantManager = ({ eventId, eventTitle, refreshTrigger = 0 }) => {
             const token = localStorage.getItem('token');
             const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
             
-            const response = await fetch('http://localhost:3001/api/registrations/bulk-status', {
+            const response = await fetch('${API_BASE_URL}/api/registrations/bulk-status', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -106,7 +107,7 @@ const ParticipantManager = ({ eventId, eventTitle, refreshTrigger = 0 }) => {
             const token = localStorage.getItem('token');
             const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
             
-            const response = await fetch(`http://localhost:3001/api/registrations/export/${eventId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/registrations/export/${eventId}`, {
                 headers: { 'Authorization': authHeader }
             });
             

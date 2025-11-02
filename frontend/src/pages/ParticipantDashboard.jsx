@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../utils/api';
 import EventImage from '../components/EventImage';
 import './ParticipantDashboard.css';
 import './ParticipantDashboardExtras.css';
@@ -124,7 +125,7 @@ function ParticipantDashboard() {
     }
     try {
       const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-      const response = await fetch('http://localhost:3001/api/registrations/my-tickets', {
+      const response = await fetch('${API_BASE_URL}/api/registrations/my-tickets', {
         headers: { 'Authorization': authHeader }
       });
 
@@ -215,7 +216,7 @@ function ParticipantDashboard() {
     for (const { event } of events) {
       try {
         // Fetch speakers for this event
-        const speakersResponse = await fetch(`http://localhost:3001/api/speakers/event/${event._id}`, {
+        const speakersResponse = await fetch(`${API_BASE_URL}/api/speakers/event/${event._id}`, {
           headers: { 'Authorization': authHeader }
         });
         if (speakersResponse.ok) {
@@ -223,7 +224,7 @@ function ParticipantDashboard() {
         }
 
         // Fetch sessions for this event
-        const sessionsResponse = await fetch(`http://localhost:3001/api/sessions/event/${event._id}`, {
+        const sessionsResponse = await fetch(`${API_BASE_URL}/api/sessions/event/${event._id}`, {
           headers: { 'Authorization': authHeader }
         });
         if (sessionsResponse.ok) {
@@ -248,7 +249,7 @@ function ParticipantDashboard() {
     for (const event of events) {
       try {
         // Fetch speakers for this event
-        const speakersResponse = await fetch(`http://localhost:3001/api/speakers/event/${event._id}`, {
+        const speakersResponse = await fetch(`${API_BASE_URL}/api/speakers/event/${event._id}`, {
           headers: { 'Authorization': authHeader }
         });
         if (speakersResponse.ok) {
@@ -257,7 +258,7 @@ function ParticipantDashboard() {
         }
 
         // Fetch sessions for this event
-        const sessionsResponse = await fetch(`http://localhost:3001/api/sessions/event/${event._id}`, {
+        const sessionsResponse = await fetch(`${API_BASE_URL}/api/sessions/event/${event._id}`, {
           headers: { 'Authorization': authHeader }
         });
         if (sessionsResponse.ok) {
@@ -301,7 +302,7 @@ function ParticipantDashboard() {
         
         const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
         
-        const response = await fetch('http://localhost:3001/api/events?status=published', {
+        const response = await fetch('${API_BASE_URL}/api/events?status=published', {
           headers: { 'Authorization': authHeader }
         });
 

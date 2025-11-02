@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../utils/api';
 import './EventDetailsPage.css';
 
 function EventDetailsPage() {
@@ -69,7 +70,7 @@ function EventDetailsPage() {
     const fetchEvent = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3001/api/events/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/events/${id}`);
         if (!response.ok) {
           throw new Error('Event not found. It might have been moved or deleted.');
         }
@@ -86,7 +87,7 @@ function EventDetailsPage() {
       if (user) {
         try {
           const token = localStorage.getItem('token');
-          const response = await fetch('http://localhost:3001/api/registrations/my-tickets', {
+          const response = await fetch(`${API_BASE_URL}/api/registrations/my-tickets`, {
             headers: { 'Authorization': token }
           });
           
@@ -105,7 +106,7 @@ function EventDetailsPage() {
 
     const fetchSpeakers = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/speakers/event/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/speakers/event/${id}`);
         const data = await response.json();
         if (data.success) {
           setSpeakers(data.speakers.filter(speaker => speaker.status === 'confirmed'));
@@ -117,7 +118,7 @@ function EventDetailsPage() {
 
     const fetchSessions = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/sessions/event/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/sessions/event/${id}`);
         const data = await response.json();
         if (data.success) {
           setSessions(data.sessions);
@@ -248,7 +249,7 @@ function EventDetailsPage() {
         throw new Error('No valid ticket type selected');
       }
       
-      const response = await fetch(`http://localhost:3001/api/registrations/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/registrations/${id}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

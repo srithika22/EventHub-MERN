@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/api';
 import './LandingPage.css';
 import EventCard from '../components/EventCard';
 import Header from '../components/Header';
@@ -114,7 +115,7 @@ function LandingPage() {
       setError(null);
       
       // Build URL with proper query parameters for Vite
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const baseUrl = API_BASE_URL;
       let url = `${baseUrl}/api/events?status=published`;
       
       if (category && category !== 'All') {

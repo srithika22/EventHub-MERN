@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './CreateEventModal.css';
+import { API_BASE_URL } from '../utils/api';
 
-function CreateEventModal({ isOpen, onClose, onEventCreated }) {
+const CreateEventModal = ({ isOpen, onClose, onEventCreated }) => {
   const [eventData, setEventData] = useState({ title: '', category: '', location: '', date: '', description: '' });
   const [imageFile, setImageFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +35,7 @@ function CreateEventModal({ isOpen, onClose, onEventCreated }) {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/events', {
+      const response = await fetch(`${API_BASE_URL}/api/events`, {
         method: 'POST',
         headers: { 'Authorization': token },
         body: formData 

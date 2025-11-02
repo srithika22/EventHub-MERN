@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import StatsCard from '../components/StatsCard';
 import RevenueChart from '../components/RevenueChart';
 import EventRevenueAnalytics from '../components/EventRevenueAnalytics';
@@ -105,16 +106,16 @@ function OrganizerDashboard({ tab }) {
 
         try {
             const [pollsResponse, questionsResponse, networkingResponse, forumResponse] = await Promise.all([
-                fetch(`http://localhost:3001/api/polling/${eventId}/polls`, {
+                fetch(`${API_BASE_URL}/api/polling/${eventId}/polls`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }),
-                fetch(`http://localhost:3001/api/qa/${eventId}/questions`, {
+                fetch(`${API_BASE_URL}/api/qa/${eventId}/questions`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }),
-                fetch(`http://localhost:3001/api/networking/${eventId}/analytics`, {
+                fetch(`${API_BASE_URL}/api/networking/${eventId}/analytics`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }),
-                fetch(`http://localhost:3001/api/forum/${eventId}/discussions`, {
+                fetch(`${API_BASE_URL}/api/forum/${eventId}/discussions`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 })
             ]);
@@ -230,7 +231,7 @@ function OrganizerDashboard({ tab }) {
         
         setLoadingStats(true);
         try {
-            const response = await fetch('http://localhost:3001/api/events/dashboard-stats', {
+            const response = await fetch('${API_BASE_URL}/api/events/dashboard-stats', {
                 headers: { 'Authorization': token }
             });
             
@@ -255,7 +256,7 @@ function OrganizerDashboard({ tab }) {
         
         setLoadingRevenue(true);
         try {
-            const response = await fetch(`http://localhost:3001/api/events/revenue-analytics?timeRange=${timeRange}`, {
+            const response = await fetch(`${API_BASE_URL}/api/events/revenue-analytics?timeRange=${timeRange}`, {
                 headers: { 'Authorization': token }
             });
             
@@ -285,7 +286,7 @@ function OrganizerDashboard({ tab }) {
         setError(null);
         
         try {
-            const response = await fetch('http://localhost:3001/api/events/my-events', {
+            const response = await fetch('${API_BASE_URL}/api/events/my-events', {
                 headers: { 'Authorization': token }
             });
             
@@ -319,7 +320,7 @@ function OrganizerDashboard({ tab }) {
 
         setCreatingPoll(true);
         try {
-            const response = await fetch(`http://localhost:3001/api/polling/${selectedEngagementEvent._id}/polls`, {
+            const response = await fetch(`${API_BASE_URL}/api/polling/${selectedEngagementEvent._id}/polls`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -362,7 +363,7 @@ function OrganizerDashboard({ tab }) {
         setLoadingPollAnalytics(true);
         try {
             // Try to fetch detailed analytics from server
-            const analyticsRes = await fetch(`http://localhost:3001/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/analytics`, {
+            const analyticsRes = await fetch(`${API_BASE_URL}/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/analytics`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -373,7 +374,7 @@ function OrganizerDashboard({ tab }) {
             }
 
             // Try to fetch detailed responses for additional insights
-            const responsesRes = await fetch(`http://localhost:3001/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/responses`, {
+            const responsesRes = await fetch(`${API_BASE_URL}/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/responses`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -557,7 +558,7 @@ function OrganizerDashboard({ tab }) {
         if (!token) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}/answer`, {
+            const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}/answer`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -588,7 +589,7 @@ function OrganizerDashboard({ tab }) {
         if (!token) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}/star`, {
+            const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}/star`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -632,7 +633,7 @@ function OrganizerDashboard({ tab }) {
         
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:3001/api/networking/${selectedEngagementEvent._id}/analytics`, {
+            const response = await fetch(`${API_BASE_URL}/api/networking/${selectedEngagementEvent._id}/analytics`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
@@ -676,7 +677,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
 
             // Try to fetch detailed poll responses
             try {
-                const response = await fetch(`http://localhost:3001/api/polling/${selectedEngagementEvent._id}/polls/${poll._id}/responses`, {
+                const response = await fetch(`${API_BASE_URL}/api/polling/${selectedEngagementEvent._id}/polls/${poll._id}/responses`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -811,8 +812,8 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
         try {
             const token = localStorage.getItem('token');
             const endpoint = currentStatus 
-                ? `http://localhost:3001/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/deactivate`
-                : `http://localhost:3001/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/activate`;
+                ? `${API_BASE_URL}/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/deactivate`
+                : `${API_BASE_URL}/api/polling/${selectedEngagementEvent._id}/polls/${pollId}/activate`;
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -839,7 +840,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:3001/api/polling/${selectedEngagementEvent._id}/polls/${pollId}`, {
+            const response = await fetch(`${API_BASE_URL}/api/polling/${selectedEngagementEvent._id}/polls/${pollId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -863,7 +864,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
         
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:3001/api/forum/${selectedEngagementEvent._id}/discussions`, {
+            const response = await fetch(`${API_BASE_URL}/api/forum/${selectedEngagementEvent._id}/discussions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -960,7 +961,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                     const token = localStorage.getItem('token');
                     
                     // Fetch dashboard stats
-                    const dashboardResponse = await fetch('http://localhost:3001/api/events/dashboard-stats', {
+                    const dashboardResponse = await fetch('${API_BASE_URL}/api/events/dashboard-stats', {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     
@@ -970,7 +971,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                         // Fetch individual event analytics if an event is selected
                         let eventAnalytics = null;
                         if (selectedAnalyticsEvent) {
-                            const eventStatsResponse = await fetch(`http://localhost:3001/api/registrations/real-time-stats/${selectedAnalyticsEvent._id}`, {
+                            const eventStatsResponse = await fetch(`${API_BASE_URL}/api/registrations/real-time-stats/${selectedAnalyticsEvent._id}`, {
                                 headers: { 'Authorization': `Bearer ${token}` }
                             });
                             
@@ -980,7 +981,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                             
                             // Fetch Q&A analytics
                             try {
-                                const qaResponse = await fetch(`http://localhost:3001/api/qa/${selectedAnalyticsEvent._id}/analytics`, {
+                                const qaResponse = await fetch(`${API_BASE_URL}/api/qa/${selectedAnalyticsEvent._id}/analytics`, {
                                     headers: { 'Authorization': `Bearer ${token}` }
                                 });
                                 
@@ -994,7 +995,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                             
                             // Fetch networking analytics
                             try {
-                                const networkingResponse = await fetch(`http://localhost:3001/api/networking/${selectedAnalyticsEvent._id}/analytics`, {
+                                const networkingResponse = await fetch(`${API_BASE_URL}/api/networking/${selectedAnalyticsEvent._id}/analytics`, {
                                     headers: { 'Authorization': `Bearer ${token}` }
                                 });
                                 
@@ -1031,7 +1032,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                 setLoadingSettings(true);
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch('http://localhost:3001/api/auth/profile', {
+                    const response = await fetch('${API_BASE_URL}/api/auth/profile', {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     
@@ -2522,7 +2523,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
             setSavingSettings(true);
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3001/api/auth/update-profile', {
+                const response = await fetch('${API_BASE_URL}/api/auth/update-profile', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import './EventNetworking.css';
 
 function EventNetworking() {
@@ -75,7 +76,7 @@ function EventNetworking() {
 
   const fetchEventData = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`);
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`);
       if (response.ok) {
         const eventData = await response.json();
         setEvent(eventData);
@@ -88,7 +89,7 @@ function EventNetworking() {
   const fetchParticipants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/networking/${eventId}/participants`, {
+      const response = await fetch(`${API_BASE_URL}/api/networking/${eventId}/participants`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -111,7 +112,7 @@ function EventNetworking() {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/networking/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -129,7 +130,7 @@ function EventNetworking() {
   const fetchConnections = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/networking/connections', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/connections`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -147,7 +148,7 @@ function EventNetworking() {
   const updateProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/networking/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +173,7 @@ function EventNetworking() {
   const sendConnectionRequest = async (participantId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/networking/connect', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/connect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -245,7 +246,7 @@ function EventNetworking() {
   const handleConnectionRequest = async (connectionId, status) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/networking/connections/${connectionId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/networking/connections/${connectionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

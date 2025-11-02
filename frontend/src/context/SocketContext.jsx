@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { SOCKET_URL } from '../utils/api';
 
 const SocketContext = createContext();
 
@@ -20,8 +21,8 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      // Initialize socket connection
-      const newSocket = io('http://localhost:3001', {
+      // Initialize socket connection using env-based socket URL
+      const newSocket = io(SOCKET_URL, {
         auth: {
           userId: user.id,
           userName: user.name

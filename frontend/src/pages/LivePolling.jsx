@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import './LivePolling.css';
 
 function LivePolling() {
@@ -32,7 +33,7 @@ function LivePolling() {
 
   const fetchEvent = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`);
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`);
       if (response.ok) {
         const eventData = await response.json();
         setEvent(eventData);
@@ -52,7 +53,7 @@ function LivePolling() {
       }
 
       // Always fetch all polls and filter on client side for consistency
-      const endpoint = `http://localhost:3001/api/polling/${eventId}/polls`;
+      const endpoint = `${API_BASE_URL}/api/polling/${eventId}/polls`;
         
       console.log('Fetching all polls from:', endpoint, 'for tab:', selectedTab);
       
@@ -101,7 +102,7 @@ function LivePolling() {
   const submitVote = async (pollId, optionIndex) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls/${pollId}/vote`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls/${pollId}/vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

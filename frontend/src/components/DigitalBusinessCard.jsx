@@ -2,7 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import './DigitalBusinessCard.css';
 
-const DigitalBusinessCard = () => {
+import React, { useState, useEffect } from 'react';
+import './DigitalBusinessCard.css';
+import { API_BASE_URL } from '../utils/api';
+
+const DigitalBusinessCard = ({ eventId, onNetworkingUpdate }) => {
   const { eventId, cardId } = useParams(); // Get eventId from route or cardId for public access
   const [businessCard, setBusinessCard] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +39,7 @@ const DigitalBusinessCard = () => {
   const fetchMyBusinessCard = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/business-cards/my-card/${eventId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/business-cards/my-card/${eventId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -60,7 +64,7 @@ const DigitalBusinessCard = () => {
   const fetchExchangedCards = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/business-cards/exchanged/${eventId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/business-cards/exchanged/${eventId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -99,8 +103,8 @@ const DigitalBusinessCard = () => {
     try {
       const token = localStorage.getItem('token');
       const url = businessCard 
-        ? `http://localhost:3001/api/business-cards/update/${businessCard._id}`
-        : `http://localhost:3001/api/business-cards/create/${eventId}`;
+        ? `${API_BASE_URL}/api/business-cards/update/${businessCard._id}`
+        : `${API_BASE_URL}/api/business-cards/create/${eventId}`;
       
       const method = businessCard ? 'PUT' : 'POST';
 
@@ -129,7 +133,7 @@ const DigitalBusinessCard = () => {
   const handleExchange = async (cardId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/business-cards/exchange/${cardId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/business-cards/exchange/${cardId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

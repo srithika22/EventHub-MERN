@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import './LiveQA.css';
 
 function LiveQA() {
@@ -25,7 +26,7 @@ function LiveQA() {
 
   const fetchEvent = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`);
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`);
       if (response.ok) {
         const eventData = await response.json();
         setEvent(eventData);
@@ -38,7 +39,7 @@ function LiveQA() {
   const fetchQuestions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/${eventId}/questions`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/${eventId}/questions`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -64,7 +65,7 @@ function LiveQA() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/${eventId}/questions`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/${eventId}/questions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +92,7 @@ function LiveQA() {
   const voteQuestion = async (questionId, voteType) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}/vote`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}/vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +116,7 @@ function LiveQA() {
   const markAsAnswered = async (questionId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}/answer`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}/answer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

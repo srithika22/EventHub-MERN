@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useMemo } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -11,10 +12,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('token'));
 
-  // Create axios instance with authentication
+  // Create axios instance with authentication using env-based base URL
   const api = useMemo(() => {
+    const base = `${API_BASE_URL}/api`;
     const instance = axios.create({
-      baseURL: 'http://localhost:3001/api',
+      baseURL: base,
     });
 
     // Add request interceptor to include the token in all requests
@@ -38,8 +40,8 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log("Attempting direct login with email:", email);
       
-      // Use a fresh axios instance without interceptors for login
-      const loginResponse = await axios.post('http://localhost:3001/api/auth/login', {
+      // Use the same instance (no token present yet) which uses env-based baseURL
+      const loginResponse = await api.post('/auth/login', {
         email,
         password
       });

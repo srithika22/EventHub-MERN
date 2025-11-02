@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/api';
 import './EventForum.css';
 
 const EventForum = () => {
@@ -33,7 +34,7 @@ const EventForum = () => {
   const fetchDiscussions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/discussions?category=${selectedCategory}&sort=${sortBy}&search=${searchTerm}`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/discussions?category=${selectedCategory}&sort=${sortBy}&search=${searchTerm}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -54,7 +55,7 @@ const EventForum = () => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/categories`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/categories`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -73,7 +74,7 @@ const EventForum = () => {
   const checkUserRole = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -97,7 +98,7 @@ const EventForum = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/discussions`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/discussions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -122,7 +123,7 @@ const EventForum = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/discussions/${discussionId}/replies`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/discussions/${discussionId}/replies`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -152,7 +153,7 @@ const EventForum = () => {
   const handleLikeDiscussion = async (discussionId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/discussions/${discussionId}/like`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/discussions/${discussionId}/like`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -173,7 +174,7 @@ const EventForum = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/discussions/${discussionId}/pin`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/discussions/${discussionId}/pin`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import './CreateEventPage.css';
 import './AIPanel.css';
 
@@ -151,7 +152,7 @@ function CreateEventPage() {
   const fetchEventData = async (id) => {
     try {
       const authHeader = token && token.startsWith('Bearer') ? token : `Bearer ${token}`;
-      const response = await fetch(`http://localhost:3001/api/events/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/events/${id}`, {
         headers: { 'Authorization': authHeader }
       });
       
@@ -592,7 +593,7 @@ function CreateEventPage() {
 
     try {
       const eventAxios = axios.create({
-        baseURL: 'http://localhost:3001/api',
+        baseURL: `${API_BASE_URL}/api`,
         headers: {
           'Authorization': token && token.startsWith('Bearer') ? token : `Bearer ${token}`,
           // Content-Type is set automatically by browser for FormData
