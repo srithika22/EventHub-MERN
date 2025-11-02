@@ -1,0 +1,158 @@
+/* Past Events Styles for Participant Dashboard */
+.past-event-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.past-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.past-event-card .event-header {
+  position: relative;
+}
+
+.past-event-card .event-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+
+.status-badge.status-attended {
+  background: #28a745;
+  color: white;
+}
+
+.badge-attended {
+  background: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.past-events-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.past-event-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f8f9fa;
+}
+
+.event-image-small img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.past-events-stats {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: center;
+}
+
+.past-events-stats .stat {
+  text-align: center;
+}
+
+.past-events-stats .stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.past-events-stats .stat-label {
+  display: block;
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+/* Past Events Styles for Organizer Dashboard */
+.past-event-card-container {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.past-event-card-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.past-event-card-container .event-status.completed {
+  background: #28a745;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.empty-state-large {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-state-large i {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  color: #dee2e6;
+}
+
+.empty-state-large h3 {
+  margin: 16px 0 8px 0;
+  color: #495057;
+}
+
+.btn-large {
+  padding: 12px 32px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+/* Certificate button styling */
+.btn-success {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-success:hover {
+  background: #218838;
+}
+
+.btn-success:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}

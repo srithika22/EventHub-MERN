@@ -1,0 +1,36 @@
+{
+  "name": "eventhub",
+  "version": "1.0.0",
+  "description": "A comprehensive MERN stack event management platform with real-time features",
+  "main": "index.js",
+  "scripts": {
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm start",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "start:frontend": "cd frontend && npm run preview",
+    "start:backend": "cd backend && npm start"
+  },
+  "keywords": [
+    "mern",
+    "event-management",
+    "react",
+    "nodejs",
+    "mongodb",
+    "express",
+    "socket.io",
+    "real-time"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/eventhub.git"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

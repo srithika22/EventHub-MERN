@@ -1,0 +1,56 @@
+.empty-state-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+@media (max-width: 576px) {
+  .empty-state-actions {
+    flex-direction: column;
+  }
+}
+
+/* Enhanced button styles */
+.btn i {
+  margin-right: 0.5rem;
+}
+
+.empty-state button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Make sure loading states are visually prominent */
+.loading-container {
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background-color: var(--bg-gray-50);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.loading-container i {
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+.loading-container p {
+  color: var(--text-medium);
+  font-size: 1.1rem;
+}
+
+/* Spinner animation for better feedback */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fa-spinner {
+  animation: spin 1.5s linear infinite;
+}
