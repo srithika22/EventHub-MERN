@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { API_BASE_URL } from '../utils/api';
 import './RealTimeQA.css';
 
 function RealTimeQA() {
@@ -88,7 +89,7 @@ function RealTimeQA() {
 
   const fetchEvent = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`);
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`);
       if (response.ok) {
         const eventData = await response.json();
         setEvent(eventData.event || eventData);
@@ -101,7 +102,7 @@ function RealTimeQA() {
   const fetchQuestions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/${eventId}/questions`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/${eventId}/questions`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -124,7 +125,7 @@ function RealTimeQA() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/${eventId}/categories`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/${eventId}/categories`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -142,7 +143,7 @@ function RealTimeQA() {
   const checkUserRole = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -164,7 +165,7 @@ function RealTimeQA() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/${eventId}/questions`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/${eventId}/questions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -198,7 +199,7 @@ function RealTimeQA() {
   const voteQuestion = async (questionId, voteType) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}/vote`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}/vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -225,7 +226,7 @@ function RealTimeQA() {
   const answerQuestion = async (questionId, answer) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}/answer`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}/answer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +258,7 @@ function RealTimeQA() {
   const starQuestion = async (questionId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}/star`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}/star`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -278,7 +279,7 @@ function RealTimeQA() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/qa/questions/${questionId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/qa/questions/${questionId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

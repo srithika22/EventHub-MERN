@@ -48,7 +48,7 @@ const SpeakerManagement = ({ eventId }) => {
   const fetchSpeakers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/speakers/event/${eventId}`);
+      const response = await fetch(`${API_BASE_URL}/api/speakers/event/${eventId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -66,8 +66,8 @@ const SpeakerManagement = ({ eventId }) => {
     try {
       const token = localStorage.getItem('token');
       const url = editingSpeaker 
-        ? `http://localhost:3001/api/speakers/${editingSpeaker._id}`
-        : 'http://localhost:3001/api/speakers';
+        ? `${API_BASE_URL}/api/speakers/${editingSpeaker._id}`
+        : '${API_BASE_URL}/api/speakers';
       
       const method = editingSpeaker ? 'PUT' : 'POST';
       
@@ -103,7 +103,7 @@ const SpeakerManagement = ({ eventId }) => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/speakers/${speakerId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/speakers/${speakerId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

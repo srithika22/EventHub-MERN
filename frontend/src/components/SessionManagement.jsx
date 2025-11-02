@@ -44,7 +44,7 @@ const SessionManagement = ({ eventId }) => {
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/sessions/event/${eventId}`);
+      const response = await fetch(`${API_BASE_URL}/api/sessions/event/${eventId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -59,7 +59,7 @@ const SessionManagement = ({ eventId }) => {
 
   const fetchSpeakers = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/speakers/event/${eventId}`);
+      const response = await fetch(`${API_BASE_URL}/api/speakers/event/${eventId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -75,8 +75,8 @@ const SessionManagement = ({ eventId }) => {
     try {
       const token = localStorage.getItem('token');
       const url = editingSession 
-        ? `http://localhost:3001/api/sessions/${editingSession._id}`
-        : 'http://localhost:3001/api/sessions';
+        ? `${API_BASE_URL}/api/sessions/${editingSession._id}`
+        : '${API_BASE_URL}/api/sessions';
       
       const method = editingSession ? 'PUT' : 'POST';
       
@@ -112,7 +112,7 @@ const SessionManagement = ({ eventId }) => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/sessions/${sessionId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/sessions/${sessionId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
