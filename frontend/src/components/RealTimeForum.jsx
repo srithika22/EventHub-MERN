@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
+import { API_BASE_URL } from '../utils/api';
 import './RealTimeForum.css';
 
 const RealTimeForum = () => {
@@ -151,7 +152,7 @@ const RealTimeForum = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `http://localhost:3001/api/forum/${eventId}/discussions?category=${selectedCategory}&sort=${sortBy}&search=${searchTerm}`,
+        `${API_BASE_URL}/api/forum/${eventId}/discussions?category=${selectedCategory}&sort=${sortBy}&search=${searchTerm}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -174,7 +175,7 @@ const RealTimeForum = () => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/categories`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/categories`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -193,7 +194,7 @@ const RealTimeForum = () => {
   const checkUserRole = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -217,7 +218,7 @@ const RealTimeForum = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/${eventId}/discussions`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/${eventId}/discussions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -244,7 +245,7 @@ const RealTimeForum = () => {
   const fetchReplies = async (discussionId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/discussions/${discussionId}/replies`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/discussions/${discussionId}/replies`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -266,7 +267,7 @@ const RealTimeForum = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/forum/discussions/${selectedDiscussion._id}/replies`, {
+      const response = await fetch(`${API_BASE_URL}/api/forum/discussions/${selectedDiscussion._id}/replies`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -292,7 +293,7 @@ const RealTimeForum = () => {
   const handleReaction = async (targetId, targetType, reaction) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:3001/api/forum/reactions`, {
+      await fetch(`${API_BASE_URL}/api/forum/reactions`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

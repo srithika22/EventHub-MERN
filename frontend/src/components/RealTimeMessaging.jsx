@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import './RealTimeMessaging.css';
 
 const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, className = '' }) => {
@@ -64,9 +65,9 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
       let url = '';
       
       if (type === 'event') {
-        url = `http://localhost:3001/api/messages/event/${eventId}?page=${page}&limit=50`;
+        url = `${API_BASE_URL}/api/messages/event/${eventId}?page=${page}&limit=50`;
       } else if (type === 'private') {
-        url = `http://localhost:3001/api/messages/private/${recipientId}?page=${page}&limit=50`;
+        url = `${API_BASE_URL}/api/messages/private/${recipientId}?page=${page}&limit=50`;
       }
 
       const response = await fetch(url, {
@@ -161,7 +162,7 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/messages/send', {
+      const response = await fetch('${API_BASE_URL}/api/messages/send', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -234,7 +235,7 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
   const handleReaction = async (messageId, emoji) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/messages/${messageId}/react`, {
+      const response = await fetch(`${API_BASE_URL}/api/messages/${messageId}/react`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -257,7 +258,7 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
   const handleEditMessage = async (messageId, newContent) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/messages/${messageId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/messages/${messageId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -278,7 +279,7 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
     if (window.confirm('Are you sure you want to delete this message?')) {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:3001/api/messages/${messageId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/messages/${messageId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,

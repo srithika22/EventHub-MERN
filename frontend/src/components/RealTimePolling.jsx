@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import './RealTimePolling.css';
 
 const RealTimePolling = () => {
@@ -93,7 +94,7 @@ const RealTimePolling = () => {
   const fetchPolls = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -115,7 +116,7 @@ const RealTimePolling = () => {
   const fetchUserResponses = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/my-responses`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/my-responses`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -138,7 +139,7 @@ const RealTimePolling = () => {
   const checkUserRole = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/events/${eventId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -164,7 +165,7 @@ const RealTimePolling = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -204,7 +205,7 @@ const RealTimePolling = () => {
   const handleVote = async (pollId, selectedOptions) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls/${pollId}/vote`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls/${pollId}/vote`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -238,7 +239,7 @@ const RealTimePolling = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3001/api/polling/${eventId}/polls/${pollId}/end`, {
+      const response = await fetch(`${API_BASE_URL}/api/polling/${eventId}/polls/${pollId}/end`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
