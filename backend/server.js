@@ -30,7 +30,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   process.env.FRONTEND_URL,
-  'https://your-frontend-domain.vercel.app' // Replace with your actual domain
+  'https://eventhub-mern.vercel.app' // Your actual Vercel domain
 ];
 
 app.use(cors({
