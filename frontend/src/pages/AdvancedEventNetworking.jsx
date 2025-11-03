@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../utils/api';
 import RealTimeMessaging from '../components/RealTimeMessaging';
 import './AdvancedEventNetworking.css';
 
@@ -169,7 +170,7 @@ function AdvancedEventNetworking() {
   const fetchParticipants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/networking/${eventId}/participants`, {
+      const response = await fetch(`${API_BASE_URL}/api/networking/${eventId}/participants`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -191,7 +192,7 @@ function AdvancedEventNetworking() {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/networking/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -211,7 +212,7 @@ function AdvancedEventNetworking() {
   const fetchConnections = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/networking/connections', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/connections`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -229,7 +230,7 @@ function AdvancedEventNetworking() {
   const fetchMessages = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/networking/messages', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/messages`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -248,7 +249,7 @@ function AdvancedEventNetworking() {
   const updateProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/networking/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -273,7 +274,7 @@ function AdvancedEventNetworking() {
   const sendConnectionRequest = async (participantId, message = '') => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/networking/connect', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/connect`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -302,7 +303,7 @@ function AdvancedEventNetworking() {
   const handleConnectionRequest = async (connectionId, status) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/networking/connections/${connectionId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/networking/connections/${connectionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -327,7 +328,7 @@ function AdvancedEventNetworking() {
   const sendMessage = async (receiverId, messageText) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/networking/messages', {
+      const response = await fetch(`${API_BASE_URL}/api/networking/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
