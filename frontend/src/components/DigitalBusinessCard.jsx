@@ -3,11 +3,13 @@ import { useParams } from 'react-router-dom';
 import './DigitalBusinessCard.css';
 
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './DigitalBusinessCard.css';
 import { API_BASE_URL } from '../utils/api';
 
-const DigitalBusinessCard = ({ eventId, onNetworkingUpdate }) => {
-  const { eventId, cardId } = useParams(); // Get eventId from route or cardId for public access
+const DigitalBusinessCard = ({ eventId: propEventId, onNetworkingUpdate }) => {
+  const { eventId: paramEventId, cardId } = useParams(); // Get eventId from route or cardId for public access
+  const eventId = propEventId || paramEventId; // Use prop eventId or URL param
   const [businessCard, setBusinessCard] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
