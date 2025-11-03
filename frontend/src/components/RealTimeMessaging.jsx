@@ -142,7 +142,15 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim()) {
+      console.log('❌ Empty message, not sending');
+      return;
+    }
+
+    console.log('📤 Sending message:', newMessage);
+    console.log('📤 Message type:', type);
+    console.log('📤 Event ID:', eventId);
+    console.log('📤 Recipient ID:', recipientId);
 
     const messageData = {
       content: newMessage.trim(),
@@ -160,9 +168,16 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
       messageData.replyToId = replyingTo._id;
     }
 
+    console.log('📤 Message data:', messageData);
+
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('${API_BASE_URL}/api/messages/send', {
+      const url = `${API_BASE_URL}/api/messages/send`;
+      
+      console.log('📤 Sending to URL:', url);
+      console.log('📤 Token exists:', !!token);
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -171,13 +186,21 @@ const RealTimeMessaging = ({ eventId, type = 'event', recipientId = null, classN
         body: JSON.stringify(messageData)
       });
 
+      console.log('📤 Response status:', response.status);
+      console.log('📤 Response ok:', response.ok);
+
       if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Message sent successfully:', result);
         setNewMessage('');
         setReplyingTo(null);
         handleStopTyping();
+      } else {
+        const error = await response.json();
+        console.error('❌ Send failed:', error);
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('❌ Error sending message:', error);
     }
   };
 

@@ -1,6 +1,6 @@
 # EventHub (MERN)
-
-[Live demo — EventHub](https://eventhub-mern.vercel.app) • [Source on GitHub](https://github.com/srithika22/EventHub-MERN)
+<a href="https://eventhub-mern.vercel.app" target="_blank" rel="noopener noreferrer">Live demo - EventHub</a>
+- [Source on GitHub](https://github.com/srithika22/EventHub-MERN)
 
 EventHub is a full‑stack MERN application for discovering, creating, and managing events. This README has been updated to match the repository layout (frontend and backend folders) and to make the Table of Contents and API Endpoints interactive so clicking entries jumps directly to the relevant section.
 
