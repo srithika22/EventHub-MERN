@@ -89,9 +89,13 @@ function EventNetworking() {
   const fetchParticipants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/networking/${eventId}/participants`, {
+      const url = `${API_BASE_URL}/api/networking/${eventId}/participants`;
+      console.log('🌐 Fetching participants from:', url);
+      console.log('🔧 API_BASE_URL value:', API_BASE_URL);
+      
+      const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': token
         }
       });
 
