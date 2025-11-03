@@ -8,7 +8,7 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://your-backend-domain.onrender.com",
-    "VITE_SOCKET_URL": "https://your-backend-domain.onrender.com"
+    "VITE_API_URL": "https://eventhub-backend-xv3i.onrender.com",
+    "VITE_SOCKET_URL": "https://eventhub-backend-xv3i.onrender.com"
   }
 }
