@@ -18,22 +18,34 @@ const qaRoutes = require('./routes/qa');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
-  }
-});
 
-// CORS configuration for production and development
+// CORS configuration for Socket.IO
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   process.env.FRONTEND_URL,
-  'https://eventhub-mern.vercel.app', // Your main Vercel domain
-  'https://eventhub-mern-dphu8rj04-rithikas-projects-4d46ea67.vercel.app' // New deployment URL
+  'https://eventhub-mern.vercel.app',
+  'https://eventhub-mern-dphu8rj04-rithikas-projects-4d46ea67.vercel.app'
 ];
 
+const io = socketIo(server, {
+  cors: {
+    origin: (origin, callback) => {
+      console.log('Socket.IO CORS Origin check:', origin);
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin) || (origin && origin.includes('vercel.app'))) {
+        return callback(null, true);
+      }
+      
+      return callback(new Error('Socket.IO CORS policy violation'), false);
+    },
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
+// CORS configuration for production and development
 app.use(cors({
   origin: (origin, callback) => {
     console.log('CORS Origin check:', origin); // Debug log
