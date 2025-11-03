@@ -1,262 +1,252 @@
-# 🎉 EventHub - MERN Stack Event Management Platform
+# EventHub (MERN)
 
-![EventHub Banner](https://via.placeholder.com/1200x300/4F46E5/ffffff?text=EventHub+-+Event+Management+Platform)
+[Live demo — EventHub](https://eventhub-mern.vercel.app) • [Source on GitHub](https://github.com/srithika22/EventHub-MERN)
 
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [API Endpoints](#api-endpoints)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
-
-## 🌟 Overview
-
-EventHub is a comprehensive event management platform built with the MERN stack. It enables event organizers to create, manage, and analyze events while providing participants with seamless registration, networking, and engagement features.
-
-**Live Demo**: [Coming Soon]
-**Backend API**: [Coming Soon]
-
-## ✨ Features
-
-### 🎯 For Event Organizers
-- **Event Management**: Create, edit, and manage events with rich media support
-- **Analytics Dashboard**: Real-time insights with revenue charts and participant analytics
-- **Live Polling**: Create and manage interactive polls during events
-- **Q&A Management**: Handle participant questions in real-time
-- **Participant Management**: Track registrations and manage attendees
-- **Revenue Tracking**: Monitor ticket sales and financial performance
-- **Settings Management**: Customize profile and notification preferences
-
-### 👥 For Participants
-- **Event Discovery**: Browse and search upcoming events
-- **Easy Registration**: Quick and secure event registration process
-- **Digital Networking**: Generate and exchange digital business cards
-- **Live Interaction**: Participate in polls and Q&A sessions
-- **Event History**: View past events and participation records
-
-### 🔧 Technical Features
-- **Real-time Communication**: Socket.io for live updates
-- **Secure Authentication**: JWT-based authentication system
-- **File Upload**: Cloudinary integration for image management
-- **Responsive Design**: Mobile-first responsive UI
-- **RESTful API**: Well-structured backend API
-- **Database**: MongoDB with Mongoose ODM
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **React.js** - UI library
-- **Vite** - Build tool and development server
-- **CSS3** - Styling with Grid and Flexbox
-- **Chart.js** - Data visualization
-- **Socket.io Client** - Real-time communication
-
-### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB ODM
-- **Socket.io** - Real-time communication
-- **JWT** - Authentication
-- **Cloudinary** - Image storage and optimization
-- **bcryptjs** - Password hashing
-
-### DevOps & Deployment
-- **Vercel** - Frontend hosting
-- **Render** - Backend hosting
-- **MongoDB Atlas** - Database hosting
-- **Git** - Version control
-
-## 📁 Project Structure
-
-```
-EventHub/
-├── 📁 frontend/               # React Frontend Application
-│   ├── 📁 public/             # Static assets
-│   ├── 📁 src/                # Frontend source code
-│   │   ├── 📁 components/     # Reusable React components
-│   │   ├── 📁 pages/          # Page components
-│   │   ├── 📁 context/        # React Context
-│   │   ├── 📁 assets/         # Images and static files
-│   │   ├── App.jsx            # Main App component
-│   │   └── main.jsx           # Entry point
-│   ├── index.html             # HTML template
-│   ├── vite.config.js         # Vite configuration
-│   ├── eslint.config.js       # ESLint configuration
-│   └── package.json           # Frontend dependencies
-├── 📁 backend/                # Node.js Backend API
-│   ├── 📁 config/             # Configuration files
-│   ├── 📁 middleware/         # Express middleware
-│   ├── 📁 models/             # MongoDB models
-│   ├── 📁 routes/             # API routes
-│   ├── server.js              # Express server
-│   └── package.json           # Backend dependencies
-├── vercel.json                # Vercel deployment config
-├── DEPLOYMENT.md              # Deployment guide
-└── README.md                  # Project documentation
-```
-
-## 🚀 Installation
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- MongoDB Atlas account
-- Cloudinary account (for image uploads)
-
-### Local Development Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/eventhub.git
-   cd eventhub
-   ```
-
-2. **Install frontend dependencies**
-   ```bash
-   cd frontend
-   npm install
-   cd ..
-   ```
-
-3. **Install backend dependencies**
-   ```bash
-   cd backend
-   npm install
-   cd ..
-   ```
-
-4. **Set up environment variables**
-   
-   Create `.env` in frontend directory:
-   ```env
-   VITE_API_URL=http://localhost:3001
-   VITE_SOCKET_URL=http://localhost:3001
-   ```
-   
-   Create `.env` in backend directory:
-   ```env
-   MONGO_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret_key
-   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-   CLOUDINARY_API_KEY=your_cloudinary_api_key
-   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   PORT=3001
-   ```
-
-5. **Start the development servers**
-   
-   Terminal 1 (Backend):
-   ```bash
-   cd backend
-   npm start
-   ```
-   
-   Terminal 2 (Frontend):
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-
-6. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3001
-
-## 🔐 Environment Variables
-
-### Frontend (.env)
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_API_URL` | Backend API URL | `http://localhost:3001` |
-| `VITE_SOCKET_URL` | Socket.io server URL | `http://localhost:3001` |
-
-### Backend (.env)
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `MONGO_URI` | MongoDB connection string | ✅ |
-| `JWT_SECRET` | JWT signing secret | ✅ |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | ✅ |
-| `CLOUDINARY_API_KEY` | Cloudinary API key | ✅ |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret | ✅ |
-| `PORT` | Server port | ❌ (default: 3001) |
-| `NODE_ENV` | Environment mode | ❌ (default: development) |
-
-## 📡 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user
-
-### Events
-- `GET /api/events` - Get all events
-- `POST /api/events` - Create new event
-- `GET /api/events/:id` - Get event by ID
-- `PUT /api/events/:id` - Update event
-- `DELETE /api/events/:id` - Delete event
-
-### Registrations
-- `POST /api/registrations` - Register for event
-- `GET /api/registrations/user/:userId` - Get user registrations
-- `GET /api/registrations/event/:eventId` - Get event registrations
-
-### More endpoints available in the API documentation...
-
-## 🌐 Deployment
-
-For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
-
-### Quick Deployment Steps:
-
-1. **Database**: Set up MongoDB Atlas
-2. **Backend**: Deploy to Render
-   - Root Directory: `backend`
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-3. **Frontend**: Deploy to Vercel
-   - Root Directory: `frontend`
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-4. **Environment**: Configure production variables
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors and testers
-- Inspired by modern event management platforms
-- Built with love using the MERN stack
+EventHub is a full‑stack MERN application for discovering, creating, and managing events. This README has been updated to match the repository layout (frontend and backend folders) and to make the Table of Contents and API Endpoints interactive so clicking entries jumps directly to the relevant section.
 
 ---
 
-⭐ **Star this repository if you find it helpful!**
+## Table of contents
 
-📧 **Questions?** Feel free to open an issue or contact me directly.
+- [About](#about)  
+- [Demo](#demo)  
+- [Features](#features)  
+- [Tech stack](#tech-stack)  
+- [Repository structure](#repository-structure)  
+- [Quickstart](#quickstart)  
+- [Environment variables](#environment-variables)  
+- [API Endpoints](#api-endpoints)  
+  - [Auth endpoints](#auth-endpoints)  
+  - [User endpoints](#user-endpoints)  
+  - [Event endpoints](#event-endpoints)  
+  - [RSVP / Attendee endpoints](#rsvp--attendee-endpoints)  
+- [Frontend routes](#frontend-routes)  
+- [Testing](#testing)  
+- [Contributing](#contributing)  
+- [License & Contact](#license--contact)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## About
+
+EventHub helps users discover local events, create and manage events, RSVP and manage attendees. The app demonstrates a typical MERN architecture with JWT authentication, protected routes, and CRUD operations for events.
+
+## Demo
+
+Visit the deployed application: https://eventhub-mern.vercel.app
+
+---
+
+## Features
+
+- User registration and authentication (JWT)
+- Create, read, update, delete events
+- RSVP / attendee management
+- Search and filter events
+- Responsive React UI
+- RESTful API (JSON)
+
+---
+
+## Tech stack
+
+- Frontend: React (Vite), React Router, Axios, Tailwind CSS / your chosen CSS framework
+- Backend: Node.js, Express
+- Database: MongoDB (Atlas or local)
+- Authentication: JSON Web Tokens (JWT)
+- Deployment: Vercel (frontend) — backend host depends on your server configuration (see DEPLOYMENT.md)
+
+---
+
+## Repository structure
+
+The README reflects the current repository layout. Key top-level items observed:
+
+- frontend/ — React app (Vite)
+- backend/ — Express API and server code
+- server/ — (present — check if duplicate or alternative API folder)
+- .env.production, vercel.json, DEPLOYMENT.md, package.json, LICENSE, etc.
+
+Note: If your working backend folder is named `server/` rather than `backend/`, use the folder that contains your Express app. The Quickstart section below assumes `backend/` and `frontend/`. Adjust commands if your structure differs.
+
+---
+
+## Quickstart
+
+Run the app locally (using the observed frontend and backend folders).
+
+1. Clone the repo
+   ```bash
+   git clone https://github.com/srithika22/EventHub-MERN.git
+   cd EventHub-MERN
+   ```
+
+2. Backend (API)
+   ```bash
+   cd backend
+   npm install
+   # copy .env.example if present, or create .env
+   cp .env.example .env || true
+   # run (use nodemon in dev if configured)
+   npm run dev
+   ```
+   Typical backend dev URL: http://localhost:5000 (or the PORT set in your .env)
+
+3. Frontend (React)
+   ```bash
+   cd ../frontend
+   npm install
+   # Vite: usually `npm run dev` — if using CRA, use `npm start`
+   npm run dev
+   ```
+   Typical frontend dev URL: http://localhost:5173 (Vite) or http://localhost:3000 (CRA)
+
+If your backend entry lives in `server/`, replace `backend` with `server` in the commands above.
+
+---
+
+## Environment variables
+
+Create a `.env` in your backend folder with at least:
+
+- MONGO_URI=your_mongodb_connection_string
+- JWT_SECRET=your_jwt_secret
+- PORT=5000
+- CLIENT_URL=http://localhost:5173
+
+Frontend (Vite) may expect:
+- VITE_API_BASE_URL=http://localhost:5000
+
+If the frontend uses CRA:
+- REACT_APP_API_BASE_URL=http://localhost:5000
+
+Check `frontend/package.json`, `frontend/vite.config.js`, or code for the exact variable name the frontend expects.
+
+---
+
+## API Endpoints
+
+(Click any link below to jump to the expanded description and examples for that endpoint.)
+
+- [Auth endpoints](#auth-endpoints)  
+  - [POST /api/auth/register](#post-api-auth-register)  
+  - [POST /api/auth/login](#post-api-auth-login)
+
+- [User endpoints](#user-endpoints)  
+  - [GET /api/users/me](#get-api-usersme)  
+  - [PUT /api/users/:id](#put-api-usersid)
+
+- [Event endpoints](#event-endpoints)  
+  - [GET /api/events](#get-api-events)  
+  - [GET /api/events/:id](#get-api-eventsid)  
+  - [POST /api/events](#post-api-events)  
+  - [PUT /api/events/:id](#put-api-eventsid)  
+  - [DELETE /api/events/:id](#delete-api-eventsid)
+
+- [RSVP / Attendee endpoints](#rsvp--attendee-endpoints)  
+  - [POST /api/events/:id/rsvp](#post-api-eventsidrsvp)  
+  - [DELETE /api/events/:id/rsvp](#delete-api-eventsidrsvp)
+
+Base URL
+- Replace BASE_URL with your backend base URL when running examples:
+  - Local dev example: http://localhost:5000
+  - Production (if backend is mounted under same domain): https://eventhub-mern.vercel.app (verify your backend path)
+
+---
+
+### Auth endpoints
+
+#### POST /api/auth/register
+Create a new user.
+
+Example cURL:
+```bash
+curl -X POST "BASE_URL/api/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","email":"alice@example.com","password":"password123"}'
+```
+
+#### POST /api/auth/login
+Authenticate and receive JWT token.
+
+Example cURL:
+```bash
+curl -X POST "BASE_URL/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alice@example.com","password":"password123"}'
+```
+
+---
+
+### User endpoints
+
+#### GET /api/users/me
+Get current authenticated user (requires Authorization header: Bearer <token>).
+
+#### PUT /api/users/:id
+Update user profile (protected, usually owner only).
+
+---
+
+### Event endpoints
+
+#### GET /api/events
+List all events.
+
+Example cURL:
+```bash
+curl -X GET "BASE_URL/api/events" -H "Accept: application/json"
+```
+
+#### GET /api/events/:id
+Get event details.
+
+#### POST /api/events
+Create a new event (protected).
+
+#### PUT /api/events/:id
+Update an event (protected, owner only).
+
+#### DELETE /api/events/:id
+Delete an event (protected, owner only).
+
+---
+
+### RSVP / Attendee endpoints
+
+#### POST /api/events/:id/rsvp
+RSVP to an event (protected).
+
+#### DELETE /api/events/:id/rsvp
+Remove RSVP (protected).
+
+---
+
+## Frontend routes
+
+Common UI routes (React Router) — click to jump to these headings inside the app (client-side):
+
+- / — Home / Discover events  
+- /events — Events listing  
+- /events/:id — Event details  
+- /create — Create new event (protected)  
+- /login — Login  
+- /register — Register  
+- /profile — User profile (protected)
+
+---
+
+## Testing
+
+- If tests are configured:
+  - Backend: from `backend/` run `npm test`
+  - Frontend: from `frontend/` run `npm test`
+- Manual testing tools: Postman, curl.
+
+---
+
+## License & Contact
+
+- License: See LICENSE file in this repo.
+- Author: srithika22 — https://github.com/srithika22
+
