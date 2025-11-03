@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import './DigitalBusinessCard.css';
-
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import './DigitalBusinessCard.css';
 import { API_BASE_URL } from '../utils/api';
+import './DigitalBusinessCard.css';
 
 const DigitalBusinessCard = ({ eventId: propEventId, onNetworkingUpdate }) => {
   const { eventId: paramEventId, cardId } = useParams(); // Get eventId from route or cardId for public access
