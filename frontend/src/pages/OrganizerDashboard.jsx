@@ -231,7 +231,7 @@ function OrganizerDashboard({ tab }) {
         
         setLoadingStats(true);
         try {
-            const response = await fetch('${API_BASE_URL}/api/events/dashboard-stats', {
+            const response = await fetch(`${API_BASE_URL}/api/events/dashboard-stats`, {
                 headers: { 'Authorization': token }
             });
             
@@ -286,7 +286,7 @@ function OrganizerDashboard({ tab }) {
         setError(null);
         
         try {
-            const response = await fetch('${API_BASE_URL}/api/events/my-events', {
+            const response = await fetch(`${API_BASE_URL}/api/events/my-events`, {
                 headers: { 'Authorization': token }
             });
             
@@ -961,7 +961,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                     const token = localStorage.getItem('token');
                     
                     // Fetch dashboard stats
-                    const dashboardResponse = await fetch('${API_BASE_URL}/api/events/dashboard-stats', {
+                    const dashboardResponse = await fetch(`${API_BASE_URL}/api/events/dashboard-stats`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     
