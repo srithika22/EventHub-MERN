@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
@@ -13,9 +14,26 @@ router.get('/:eventId/participants', authMiddleware, async (req, res) => {
     try {
         const eventId = req.params.eventId;
         
+        // Validate ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(eventId)) {
+            console.log('❌ Invalid eventId format:', eventId);
+            return res.status(400).json({ message: 'Invalid event ID format' });
+        }
+        
+        console.log('🔍 Fetching participants for event:', eventId);
+        
+        // Check if event exists
+        const event = await Event.findById(eventId);
+        if (!event) {
+            console.log('❌ Event not found:', eventId);
+            return res.status(404).json({ message: 'Event not found' });
+        }
+        
         // Find all registrations for this event
         const registrations = await Registration.find({ event: eventId })
             .populate('participant');
+        
+        console.log('📊 Found registrations:', registrations.length);
         
         // Filter participants who have networking profiles and opted in
         const networkingParticipants = registrations
