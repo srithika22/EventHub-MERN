@@ -125,7 +125,7 @@ function ParticipantDashboard() {
     }
     try {
       const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-      const response = await fetch('${API_BASE_URL}/api/registrations/my-tickets', {
+      const response = await fetch(`${API_BASE_URL}/api/registrations/my-tickets`, {
         headers: { 'Authorization': authHeader }
       });
 
@@ -302,7 +302,7 @@ function ParticipantDashboard() {
         
         const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
         
-        const response = await fetch('${API_BASE_URL}/api/events?status=published', {
+        const response = await fetch(`${API_BASE_URL}/api/events?status=published`, {
           headers: { 'Authorization': authHeader }
         });
 
