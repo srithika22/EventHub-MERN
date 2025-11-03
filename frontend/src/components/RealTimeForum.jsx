@@ -6,7 +6,7 @@ import './RealTimeForum.css';
 
 const RealTimeForum = () => {
   const { eventId } = useParams();
-  const socket = useSocket();
+  const { socket, joinEvent, leaveEvent, emitNewDiscussion, emitNewReply, emitForumTyping, emitForumStopTyping } = useSocket();
   const [discussions, setDiscussions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -40,7 +40,7 @@ const RealTimeForum = () => {
   useEffect(() => {
     if (socket && eventId) {
       // Join event room
-      socket.emit('join-event', eventId);
+      joinEvent(eventId);
 
       // Socket event listeners
       socket.on('forum-discussion-added', handleNewDiscussion);
@@ -65,7 +65,7 @@ const RealTimeForum = () => {
         socket.off('forum-typing');
         socket.off('forum-stop-typing');
         socket.off('forum-users-online');
-        socket.emit('leave-event', eventId);
+        leaveEvent(eventId);
       };
     }
   }, [socket, eventId]);
@@ -309,10 +309,7 @@ const RealTimeForum = () => {
 
   const handleTyping = () => {
     if (socket && selectedDiscussion) {
-      socket.emit('forum-typing', {
-        discussionId: selectedDiscussion._id,
-        eventId
-      });
+      emitForumTyping(eventId, selectedDiscussion._id);
 
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
@@ -323,10 +320,7 @@ const RealTimeForum = () => {
 
   const stopTyping = () => {
     if (socket && selectedDiscussion) {
-      socket.emit('forum-stop-typing', {
-        discussionId: selectedDiscussion._id,
-        eventId
-      });
+      emitForumStopTyping(eventId, selectedDiscussion._id);
     }
   };
 

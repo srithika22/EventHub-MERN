@@ -148,6 +148,18 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
+  const emitForumTyping = (eventId, discussionId) => {
+    if (socket) {
+      socket.emit('forum-typing', { eventId, discussionId });
+    }
+  };
+
+  const emitForumStopTyping = (eventId, discussionId) => {
+    if (socket) {
+      socket.emit('forum-stop-typing', { eventId, discussionId });
+    }
+  };
+
   const value = {
     socket,
     connected,
@@ -164,7 +176,9 @@ export const SocketProvider = ({ children }) => {
     emitNewQuestion,
     emitQuestionAnswered,
     emitNewDiscussion,
-    emitNewReply
+    emitNewReply,
+    emitForumTyping,
+    emitForumStopTyping
   };
 
   return (
