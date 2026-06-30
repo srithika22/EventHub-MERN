@@ -26,6 +26,36 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
+async function getRegistrationCountsByEvent() {
+    const Registration = mongoose.model('Registration');
+    const rows = await Registration.aggregate([
+        {
+            $group: {
+                _id: {
+                    event: '$event',
+                    ticketTypeName: '$ticketTypeName'
+                },
+                quantity: { $sum: '$quantity' }
+            }
+        }
+    ]);
+
+    const countsByEvent = new Map();
+
+    rows.forEach((row) => {
+        const eventId = String(row._id.event);
+        const ticketTypeName = row._id.ticketTypeName || '';
+
+        if (!countsByEvent.has(eventId)) {
+            countsByEvent.set(eventId, new Map());
+        }
+
+        countsByEvent.get(eventId).set(ticketTypeName, row.quantity || 0);
+    });
+
+    return countsByEvent;
+}
+
 // Utility: safely parse JSON strings from form-data fields
 function safeParse(value, defaultValue) {
     if (value === undefined || value === null) return defaultValue;
@@ -166,40 +196,32 @@ router.get('/', async (req, res) => {
         const events = await Event.find(query)
             .populate('organizer', 'name')
             .sort({ date: 1 });
-            
-        // Add additional info to each event
-        const Registration = mongoose.model('Registration');
-        const enhancedEvents = await Promise.all(events.map(async (event) => {
+
+        const registrationCounts = await getRegistrationCountsByEvent();
+
+        const enhancedEvents = events.map((event) => {
             const eventObj = event.toObject();
-            
-            // Calculate registration counts
+            const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+
             if (eventObj.ticketTypes && eventObj.ticketTypes.length > 0) {
                 let totalEventTickets = 0;
-                
-                for (let i = 0; i < eventObj.ticketTypes.length; i++) {
-                    const ticketType = eventObj.ticketTypes[i];
-                    
-                    // Get registrations for this ticket type
-                    const registrations = await Registration.find({
-                        event: event._id,
-                        ticketTypeName: ticketType.name
-                    });
-                    
-                    // Sum up quantities from registrations
-                    const ticketsSold = registrations.reduce((sum, reg) => sum + reg.quantity, 0);
-                    
-                    // Update the ticket type with sales data
-                    eventObj.ticketTypes[i].ticketsSold = ticketsSold;
+
+                eventObj.ticketTypes = eventObj.ticketTypes.map((ticketType) => {
+                    const ticketsSold = eventCounts.get(ticketType.name) || 0;
                     totalEventTickets += ticketsSold;
-                }
-                
-                // Update total tickets sold
+
+                    return {
+                        ...ticketType,
+                        ticketsSold
+                    };
+                });
+
                 eventObj.totalTicketsSold = totalEventTickets;
             }
-            
+
             return eventObj;
-        }));
-        
+        });
+
         res.status(200).json(enhancedEvents);
     } catch (error) {
         console.error('Error fetching events:', error);
@@ -216,41 +238,30 @@ router.get('/my-events', authMiddleware, async (req, res) => {
         const events = await Event.find({ organizer: req.user.id }).sort({ createdAt: -1 });
         console.log('📋 Found', events.length, 'events for organizer:', req.user.id);
         
-        // Add ticket registration counts
-        const Registration = mongoose.model('Registration');
-        
-        // Enhanced events with registration counts
-        const enhancedEvents = await Promise.all(events.map(async (event) => {
+        const registrationCounts = await getRegistrationCountsByEvent();
+
+        const enhancedEvents = events.map((event) => {
             const eventObj = event.toObject();
-            
-            // Calculate ticket sales for each ticket type
+            const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+
             if (eventObj.ticketTypes && eventObj.ticketTypes.length > 0) {
-                // Calculate total tickets sold for this event
                 let totalEventTickets = 0;
-                
-                for (let i = 0; i < eventObj.ticketTypes.length; i++) {
-                    const ticketType = eventObj.ticketTypes[i];
-                    
-                    // Count registrations for this specific ticket type
-                    const registrations = await Registration.find({
-                        event: event._id,
-                        ticketTypeName: ticketType.name
-                    });
-                    
-                    // Calculate total tickets by summing quantities
-                    const ticketsSold = registrations.reduce((sum, reg) => sum + reg.quantity, 0);
-                    
-                    // Add count to the ticket type
-                    eventObj.ticketTypes[i].ticketsSold = ticketsSold;
+
+                eventObj.ticketTypes = eventObj.ticketTypes.map((ticketType) => {
+                    const ticketsSold = eventCounts.get(ticketType.name) || 0;
                     totalEventTickets += ticketsSold;
-                }
-                
-                // Add total tickets sold to the event
+
+                    return {
+                        ...ticketType,
+                        ticketsSold
+                    };
+                });
+
                 eventObj.totalTicketsSold = totalEventTickets;
             }
-            
+
             return eventObj;
-        }));
+        });
         
         res.status(200).json(enhancedEvents);
     } catch (error) {
@@ -297,20 +308,16 @@ router.get('/dashboard-stats', authMiddleware, async (req, res) => {
             }
         };
         
-        // Calculate revenue and ticket sales
-        const Registration = mongoose.model('Registration');
-        
+        const registrationCounts = await getRegistrationCountsByEvent();
+
         for (const event of events) {
             if (event.ticketTypes && event.ticketTypes.length > 0) {
+                const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+
                 for (const ticketType of event.ticketTypes) {
-                    const registrations = await Registration.find({
-                        event: event._id,
-                        ticketTypeName: ticketType.name
-                    });
-                    
-                    const ticketsSold = registrations.reduce((sum, reg) => sum + reg.quantity, 0);
+                    const ticketsSold = eventCounts.get(ticketType.name) || 0;
                     const revenue = ticketsSold * ticketType.price;
-                    
+
                     stats.totalTicketsSold += ticketsSold;
                     stats.totalRevenue += revenue;
                 }
@@ -385,6 +392,8 @@ router.get('/revenue-analytics', authMiddleware, async (req, res) => {
             organizer: organizerId,
             createdAt: { $gte: startDate, $lte: endDate }
         });
+
+        const registrationCounts = await getRegistrationCountsByEvent();
         
         // Initialize monthly data
         const monthlyData = [];
@@ -410,18 +419,13 @@ router.get('/revenue-analytics', authMiddleware, async (req, res) => {
             });
             
             monthData.events = monthEvents.length;
-            
-            // Calculate revenue and tickets for each event
-            const Registration = mongoose.model('Registration');
+
             for (const event of monthEvents) {
                 if (event.ticketTypes && event.ticketTypes.length > 0) {
+                    const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+
                     for (const ticketType of event.ticketTypes) {
-                        const registrations = await Registration.find({
-                            event: event._id,
-                            ticketTypeName: ticketType.name
-                        });
-                        
-                        const ticketsSold = registrations.reduce((sum, reg) => sum + reg.quantity, 0);
+                        const ticketsSold = eventCounts.get(ticketType.name) || 0;
                         monthData.tickets += ticketsSold;
                         monthData.revenue += ticketsSold * ticketType.price;
                     }
@@ -488,8 +492,6 @@ router.get('/enhanced-analytics', authMiddleware, async (req, res) => {
             });
         }
 
-        const Registration = mongoose.model('Registration');
-        
         // Initialize analytics data
         let totalRevenue = 0;
         let totalTickets = 0;
@@ -498,19 +500,18 @@ router.get('/enhanced-analytics', authMiddleware, async (req, res) => {
         const categoryMap = new Map();
         
         // Calculate metrics for each event
+        const registrationCounts = await getRegistrationCountsByEvent();
+
         for (const event of events) {
             // Add to total views (using a placeholder - you can track actual views)
             totalViews += event.views || Math.floor(Math.random() * 100) + 50;
             
             // Process each ticket type
             if (event.ticketTypes && event.ticketTypes.length > 0) {
+                const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+
                 for (const ticketType of event.ticketTypes) {
-                    const registrations = await Registration.find({
-                        event: event._id,
-                        ticketTypeName: ticketType.name
-                    });
-                    
-                    const ticketsSold = registrations.reduce((sum, reg) => sum + reg.quantity, 0);
+                    const ticketsSold = eventCounts.get(ticketType.name) || 0;
                     const revenue = ticketsSold * ticketType.price;
                     
                     totalTickets += ticketsSold;
