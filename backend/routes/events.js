@@ -56,6 +56,54 @@ async function getRegistrationCountsByEvent() {
     return countsByEvent;
 }
 
+async function getReviewStatsByEventIds(eventIds) {
+    const EventReview = mongoose.model('EventReview');
+
+    if (!Array.isArray(eventIds) || eventIds.length === 0) {
+        return new Map();
+    }
+
+    const rows = await EventReview.aggregate([
+        { $match: { event: { $in: eventIds } } },
+        {
+            $group: {
+                _id: '$event',
+                averageRating: { $avg: '$rating' },
+                reviewCount: { $sum: 1 }
+            }
+        }
+    ]);
+
+    const reviewStats = new Map();
+
+    rows.forEach((row) => {
+        reviewStats.set(String(row._id), {
+            averageRating: Number((row.averageRating || 0).toFixed(1)),
+            reviewCount: row.reviewCount || 0
+        });
+    });
+
+    return reviewStats;
+}
+
+function getEventTicketsSold(event, registrationCounts) {
+    const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+    let total = 0;
+
+    if (event.ticketTypes && event.ticketTypes.length > 0) {
+        for (const ticketType of event.ticketTypes) {
+            total += eventCounts.get(ticketType.name) || 0;
+        }
+    }
+
+    return total;
+}
+
+function getTicketsSoldForType(event, ticketTypeName, registrationCounts) {
+    const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+    return eventCounts.get(ticketTypeName) || 0;
+}
+
 // Utility: safely parse JSON strings from form-data fields
 function safeParse(value, defaultValue) {
     if (value === undefined || value === null) return defaultValue;
@@ -239,10 +287,12 @@ router.get('/my-events', authMiddleware, async (req, res) => {
         console.log('📋 Found', events.length, 'events for organizer:', req.user.id);
         
         const registrationCounts = await getRegistrationCountsByEvent();
+        const reviewStats = await getReviewStatsByEventIds(events.map(event => event._id));
 
         const enhancedEvents = events.map((event) => {
             const eventObj = event.toObject();
             const eventCounts = registrationCounts.get(String(event._id)) || new Map();
+            const reviews = reviewStats.get(String(event._id)) || { averageRating: 0, reviewCount: 0 };
 
             if (eventObj.ticketTypes && eventObj.ticketTypes.length > 0) {
                 let totalEventTickets = 0;
@@ -259,6 +309,9 @@ router.get('/my-events', authMiddleware, async (req, res) => {
 
                 eventObj.totalTicketsSold = totalEventTickets;
             }
+
+            eventObj.averageRating = reviews.averageRating;
+            eventObj.reviewCount = reviews.reviewCount;
 
             return eventObj;
         });
@@ -539,24 +592,25 @@ router.get('/enhanced-analytics', authMiddleware, async (req, res) => {
             if (categoryMap.has(category)) {
                 const existing = categoryMap.get(category);
                 existing.eventCount += 1;
+                const eventAttendance = getEventTicketsSold(event, registrationCounts);
                 existing.revenue += event.ticketTypes ? 
                     event.ticketTypes.reduce((sum, tt) => {
-                        const regs = Registration.find({ event: event._id, ticketTypeName: tt.name });
-                        return sum + (regs.length * tt.price);
+                        const ticketsSold = getTicketsSoldForType(event, tt.name, registrationCounts);
+                        return sum + (ticketsSold * tt.price);
                     }, 0) : 0;
+                existing.totalAttendance += eventAttendance;
             } else {
                 const eventRevenue = event.ticketTypes ? 
-                    await Promise.all(event.ticketTypes.map(async (tt) => {
-                        const regs = await Registration.find({ event: event._id, ticketTypeName: tt.name });
-                        return regs.reduce((sum, reg) => sum + reg.quantity, 0) * tt.price;
-                    })).then(revenues => revenues.reduce((sum, rev) => sum + rev, 0)) : 0;
+                    event.ticketTypes.reduce((sum, tt) => {
+                        const ticketsSold = getTicketsSoldForType(event, tt.name, registrationCounts);
+                        return sum + (ticketsSold * tt.price);
+                    }, 0) : 0;
                     
                 categoryMap.set(category, {
                     name: category,
                     eventCount: 1,
                     revenue: eventRevenue,
-                    totalAttendance: await Registration.find({ event: event._id })
-                        .then(regs => regs.reduce((sum, reg) => sum + reg.quantity, 0)),
+                    totalAttendance: getEventTicketsSold(event, registrationCounts),
                     avgRevenue: 0
                 });
             }

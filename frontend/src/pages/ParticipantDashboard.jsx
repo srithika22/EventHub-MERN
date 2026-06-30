@@ -98,6 +98,7 @@ function ParticipantDashboard() {
   const [myEvents, setMyEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
   const [availableEvents, setAvailableEvents] = useState([]);
+  const [recommendationStrategy, setRecommendationStrategy] = useState('fallback');
   const [loadingMyEvents, setLoadingMyEvents] = useState(true);
   const [loadingPastEvents, setLoadingPastEvents] = useState(true);
   const [loadingAvailableEvents, setLoadingAvailableEvents] = useState(true);
@@ -107,12 +108,88 @@ function ParticipantDashboard() {
   // Speaker and session data for enhanced event cards
   const [eventSpeakers, setEventSpeakers] = useState({});
   const [eventSessions, setEventSessions] = useState({});
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedReviewEvent, setSelectedReviewEvent] = useState(null);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
     toast.success("You've been logged out.");
   };
+
+  const openReviewModal = (event) => {
+    setSelectedReviewEvent(event);
+    setReviewForm({ rating: 5, comment: '' });
+    setShowReviewModal(true);
+  };
+
+  const closeReviewModal = () => {
+    setShowReviewModal(false);
+    setSelectedReviewEvent(null);
+  };
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+
+    if (!selectedReviewEvent) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Please log in again to submit your review.');
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(`${API_BASE_URL}/api/event-reviews/events/${selectedReviewEvent._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify({
+          rating: Number(reviewForm.rating),
+          comment: reviewForm.comment
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to save review');
+      }
+
+      toast.success('Review submitted successfully.');
+      closeReviewModal();
+    } catch (error) {
+      console.error('Review submission error:', error);
+      toast.error(error.message || 'Could not submit review.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const trackActivity = useCallback(async ({ eventId, actionType, actionValue = '', context = {}, metadata = {} }) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      await fetch(`${API_BASE_URL}/api/activity/ingest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify({ eventId, actionType, actionValue, context, metadata })
+      });
+    } catch (err) {
+      console.warn('Activity tracking failed:', err);
+    }
+  }, []);
 
   const fetchMyEvents = useCallback(async () => {
     setLoadingMyEvents(true);
@@ -302,6 +379,40 @@ function ParticipantDashboard() {
         
         const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
         
+        const recResponse = await fetch(`${API_BASE_URL}/api/recommendations/feed?limit=30`, {
+          headers: { 'Authorization': authHeader }
+        });
+
+        let recommendedEvents = [];
+
+        if (recResponse.ok) {
+          const recData = await recResponse.json();
+          setRecommendationStrategy(recData.strategy || 'hybrid-v1');
+
+          if (Array.isArray(recData.recommendations)) {
+            recommendedEvents = recData.recommendations
+              .map((item) => ({
+                ...item.event,
+                recommendationMeta: {
+                  reason: item.reason,
+                  score: item.score,
+                  rank: item.rank
+                }
+              }))
+              .filter((event) => {
+                const eventId = normalizeId(event?._id);
+                return eventId && !registeredEventIds.has(eventId);
+              });
+          }
+        }
+
+        if (recommendedEvents.length > 0) {
+          setAvailableEvents(recommendedEvents);
+          await fetchEventSpeakersAndSessionsForBrowse(recommendedEvents.slice(0, 12));
+          return;
+        }
+
+        // Fallback: default published events if personalized recommendations are unavailable.
         const response = await fetch(`${API_BASE_URL}/api/events?status=published`, {
           headers: { 'Authorization': authHeader }
         });
@@ -309,22 +420,17 @@ function ParticipantDashboard() {
         if (response.ok) {
           const allEvents = await response.json();
           if (Array.isArray(allEvents)) {
-            // console.log(`Received ${allEvents.length} total events from API`);
-            // console.log(`Filtering out ${registeredEventIds.size} registered events`);
-            
             const filteredEvents = allEvents.filter(event => {
               const eventId = normalizeId(event?._id);
               const isRegistered = registeredEventIds.has(eventId);
-              // console.log(`Event ${event?.title} (${eventId}): ${isRegistered ? 'EXCLUDED (registered)' : 'INCLUDED (available)'}`);
               return eventId && !isRegistered;
             });
-            
-            // console.log(`Found ${filteredEvents.length} available events after filtering`);
+
+            setRecommendationStrategy('fallback-trending');
             setAvailableEvents(filteredEvents);
-            
-            // Fetch speakers and sessions for available events as well
+
             if (filteredEvents.length > 0) {
-              await fetchEventSpeakersAndSessionsForBrowse(filteredEvents);
+              await fetchEventSpeakersAndSessionsForBrowse(filteredEvents.slice(0, 12));
             }
           }
         }
@@ -539,9 +645,26 @@ function ParticipantDashboard() {
                   ) : availableEvents.length > 0 ? (
                     <div className="event-recommendations">
                       {availableEvents.slice(0, 3).map(event => (
-                        <Link to={`/events/${event._id}`} key={event._id} className="event-card">
+                        <Link
+                          to={`/events/${event._id}`}
+                          key={event._id}
+                          className="event-card"
+                          onClick={() => trackActivity({
+                            eventId: event._id,
+                            actionType: 'click',
+                            actionValue: 'recommendation_open',
+                            context: { source: 'participant-dashboard' },
+                            metadata: {
+                              strategy: recommendationStrategy,
+                              reason: event.recommendationMeta?.reason || ''
+                            }
+                          })}
+                        >
                           <div className="event-details">
                             <span className="event-category">{event.category}</span>
+                            {event.recommendationMeta?.reason && (
+                              <span className="recommendation-reason">{event.recommendationMeta.reason}</span>
+                            )}
                             <h4 className="event-title">{event.title}</h4>
                             
                             {/* Show speakers and sessions count */}
@@ -984,7 +1107,7 @@ function ParticipantDashboard() {
                            </button>
                          )}
                          <button className="btn btn-secondary" onClick={() => {
-                           toast.info('Event feedback feature coming soon!');
+                           openReviewModal(event);
                          }}>
                            <i className="fas fa-star"></i> Leave Review
                          </button>
@@ -1054,7 +1177,22 @@ function ParticipantDashboard() {
                                   </div>
                                   <p className="event-description">{event.description ? `${event.description.substring(0, 100)}...` : "No description."}</p>
                                   <div className="event-actions">
-                                      <Link to={`/events/${event._id}`} className="btn btn-primary">View & Register</Link>
+                                      <Link
+                                        to={`/events/${event._id}`}
+                                        className="btn btn-primary"
+                                        onClick={() => trackActivity({
+                                          eventId: event._id,
+                                          actionType: 'click',
+                                          actionValue: 'browse_open',
+                                          context: { source: 'participant-browse' },
+                                          metadata: {
+                                            strategy: recommendationStrategy,
+                                            reason: event.recommendationMeta?.reason || ''
+                                          }
+                                        })}
+                                      >
+                                        View & Register
+                                      </Link>
                                   </div>
                               </div>
                           </div>
@@ -1095,6 +1233,57 @@ function ParticipantDashboard() {
                         <span className="stat-label">Registered Events</span>
                     </div>
                 </div>
+            </div>
+          </div>
+        )}
+
+        {showReviewModal && selectedReviewEvent && (
+          <div className="review-modal-overlay" onClick={closeReviewModal}>
+            <div className="review-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="review-modal-header">
+                <div>
+                  <h3>Leave a Review</h3>
+                  <p>{selectedReviewEvent.title}</p>
+                </div>
+                <button type="button" className="review-modal-close" onClick={closeReviewModal}>
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+
+              <form className="review-form" onSubmit={submitReview}>
+                <label>
+                  Rating
+                  <select
+                    value={reviewForm.rating}
+                    onChange={(e) => setReviewForm(prev => ({ ...prev, rating: e.target.value }))}
+                  >
+                    <option value={5}>5 - Excellent</option>
+                    <option value={4}>4 - Very Good</option>
+                    <option value={3}>3 - Good</option>
+                    <option value={2}>2 - Fair</option>
+                    <option value={1}>1 - Poor</option>
+                  </select>
+                </label>
+
+                <label>
+                  Comment
+                  <textarea
+                    rows="4"
+                    value={reviewForm.comment}
+                    onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                    placeholder="Share what you liked about the event"
+                  />
+                </label>
+
+                <div className="review-modal-actions">
+                  <button type="button" className="btn btn-outline" onClick={closeReviewModal}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submittingReview}>
+                    {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

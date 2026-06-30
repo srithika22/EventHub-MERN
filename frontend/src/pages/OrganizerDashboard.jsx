@@ -30,6 +30,7 @@ function OrganizerDashboard({ tab }) {
     const [loading, setLoading] = useState(true);
     const [loadingStats, setLoadingStats] = useState(true);
     const [loadingRevenue, setLoadingRevenue] = useState(true);
+    const [loadingRecommendationMetrics, setLoadingRecommendationMetrics] = useState(true);
     const [error, setError] = useState(null);
     const [activePage, setActivePage] = useState(tab || 'dashboard');
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -76,6 +77,11 @@ function OrganizerDashboard({ tab }) {
     const [selectedAnalyticsEvent, setSelectedAnalyticsEvent] = useState(null);
     const [analyticsTimeRange, setAnalyticsTimeRange] = useState('3months');
     const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+    const [recommendationMetrics, setRecommendationMetrics] = useState(null);
+    const [recommendationTrends, setRecommendationTrends] = useState(null);
+    const [selectedAudienceEventId, setSelectedAudienceEventId] = useState('');
+    const [loadingAudienceInsights, setLoadingAudienceInsights] = useState(false);
+    const [audienceInsights, setAudienceInsights] = useState(null);
     
     // Settings State
     const [userSettings, setUserSettings] = useState({
@@ -273,6 +279,87 @@ function OrganizerDashboard({ tab }) {
             setLoadingRevenue(false);
         }
     }, []);
+
+    // Fetch recommendation KPIs for organizer dashboard.
+    const fetchRecommendationMetrics = useCallback(async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        setLoadingRecommendationMetrics(true);
+        try {
+            const [currentRes, previousRes] = await Promise.all([
+                fetch(`${API_BASE_URL}/api/recommendations/metrics/summary?days=7`, {
+                    headers: { 'Authorization': token }
+                }),
+                fetch(`${API_BASE_URL}/api/recommendations/metrics/summary?days=7&offsetDays=7`, {
+                    headers: { 'Authorization': token }
+                })
+            ]);
+
+            if (!currentRes.ok) {
+                const errorText = await currentRes.text();
+                console.error('Recommendation metrics error:', currentRes.status, errorText);
+                setRecommendationMetrics(null);
+                setRecommendationTrends(null);
+                return;
+            }
+
+            const current = await currentRes.json();
+            let previous = null;
+            if (previousRes.ok) {
+                previous = await previousRes.json();
+            }
+
+            const calcDelta = (currentValue, previousValue) => {
+                if (!previousValue) {
+                    return currentValue > 0 ? 100 : 0;
+                }
+                return Number((((currentValue - previousValue) / previousValue) * 100).toFixed(2));
+            };
+
+            setRecommendationMetrics(current);
+            setRecommendationTrends(previous ? {
+                ctrDelta: calcDelta(current.rates?.ctr || 0, previous.rates?.ctr || 0),
+                clickDelta: calcDelta(current.funnel?.clicks || 0, previous.funnel?.clicks || 0),
+                registrationDelta: calcDelta(current.funnel?.registrations || 0, previous.funnel?.registrations || 0),
+                impressionDelta: calcDelta(current.funnel?.impressions || 0, previous.funnel?.impressions || 0)
+            } : null);
+        } catch (error) {
+            console.error('Error fetching recommendation metrics:', error);
+            setRecommendationMetrics(null);
+            setRecommendationTrends(null);
+        } finally {
+            setLoadingRecommendationMetrics(false);
+        }
+    }, []);
+
+    const fetchAudienceInsights = useCallback(async (eventIdOverride) => {
+        const token = localStorage.getItem('token');
+        const targetEventId = eventIdOverride || selectedAudienceEventId;
+        if (!token || !targetEventId) return;
+
+        setLoadingAudienceInsights(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/recommendations/audience/${targetEventId}`, {
+                headers: { 'Authorization': token }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Audience insights error:', response.status, errorText);
+                setAudienceInsights(null);
+                return;
+            }
+
+            const data = await response.json();
+            setAudienceInsights(data);
+        } catch (error) {
+            console.error('Error fetching audience insights:', error);
+            setAudienceInsights(null);
+        } finally {
+            setLoadingAudienceInsights(false);
+        }
+    }, [selectedAudienceEventId]);
 
     // Fetch events
     const fetchMyEvents = useCallback(async () => {
@@ -943,7 +1030,20 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
         fetchMyEvents();
         fetchDashboardStats();
         fetchRevenueData();
-    }, [fetchMyEvents, fetchDashboardStats, fetchRevenueData, refreshTrigger]);
+        fetchRecommendationMetrics();
+    }, [fetchMyEvents, fetchDashboardStats, fetchRevenueData, fetchRecommendationMetrics, refreshTrigger]);
+
+    useEffect(() => {
+        if (!selectedAudienceEventId && myEvents.length > 0) {
+            setSelectedAudienceEventId(myEvents[0]._id);
+        }
+    }, [myEvents, selectedAudienceEventId]);
+
+    useEffect(() => {
+        if (selectedAudienceEventId) {
+            fetchAudienceInsights(selectedAudienceEventId);
+        }
+    }, [selectedAudienceEventId, fetchAudienceInsights]);
 
     // Load engagement data when event is selected
     useEffect(() => {
@@ -1127,6 +1227,174 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                     value={loadingStats ? "Loading..." : (dashboardStats?.averageRating || 0).toFixed(1)}
                     trend="+3%"
                 />
+            </div>
+
+            <div className="ai-kpi-section">
+                <div className="ai-kpi-header">
+                    <h3>AI Recommendation Funnel (Last 7 Days)</h3>
+                    <button className="btn btn-secondary" onClick={fetchRecommendationMetrics}>
+                        <i className="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+
+                {loadingRecommendationMetrics ? (
+                    <div className="loading-state compact">
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <p>Loading recommendation KPIs...</p>
+                    </div>
+                ) : recommendationMetrics ? (
+                    <div className="ai-kpi-grid">
+                        <div className="ai-kpi-card">
+                            <p className="kpi-label">Impressions</p>
+                            <h4>{recommendationMetrics.funnel?.impressions || 0}</h4>
+                            <span className={`kpi-trend ${(recommendationTrends?.impressionDelta || 0) >= 0 ? 'up' : 'down'}`}>
+                                {(recommendationTrends?.impressionDelta || 0) >= 0 ? '+' : ''}{recommendationTrends?.impressionDelta ?? 0}% vs previous 7d
+                            </span>
+                        </div>
+                        <div className="ai-kpi-card">
+                            <p className="kpi-label">Clicks</p>
+                            <h4>{recommendationMetrics.funnel?.clicks || 0}</h4>
+                            <span className={`kpi-trend ${(recommendationTrends?.clickDelta || 0) >= 0 ? 'up' : 'down'}`}>
+                                {(recommendationTrends?.clickDelta || 0) >= 0 ? '+' : ''}{recommendationTrends?.clickDelta ?? 0}% vs previous 7d
+                            </span>
+                        </div>
+                        <div className="ai-kpi-card">
+                            <p className="kpi-label">Registrations</p>
+                            <h4>{recommendationMetrics.funnel?.registrations || 0}</h4>
+                            <span className={`kpi-trend ${(recommendationTrends?.registrationDelta || 0) >= 0 ? 'up' : 'down'}`}>
+                                {(recommendationTrends?.registrationDelta || 0) >= 0 ? '+' : ''}{recommendationTrends?.registrationDelta ?? 0}% vs previous 7d
+                            </span>
+                        </div>
+                        <div className="ai-kpi-card">
+                            <p className="kpi-label">CTR</p>
+                            <h4>{recommendationMetrics.rates?.ctr || 0}%</h4>
+                            <span className={`kpi-trend ${(recommendationTrends?.ctrDelta || 0) >= 0 ? 'up' : 'down'}`}>
+                                {(recommendationTrends?.ctrDelta || 0) >= 0 ? '+' : ''}{recommendationTrends?.ctrDelta ?? 0}% vs previous 7d
+                            </span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="error-state compact">
+                        <i className="fas fa-chart-line"></i>
+                        <p>Recommendation metrics are not available yet.</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="ai-audience-section">
+                <div className="ai-kpi-header">
+                    <h3>Audience Intelligence</h3>
+                    <div className="ai-audience-controls">
+                        <select
+                            className="form-control"
+                            value={selectedAudienceEventId}
+                            onChange={(e) => setSelectedAudienceEventId(e.target.value)}
+                        >
+                            {myEvents.length === 0 ? (
+                                <option value="">No active events</option>
+                            ) : (
+                                myEvents.map((event) => (
+                                    <option key={event._id} value={event._id}>
+                                        {event.title}
+                                    </option>
+                                ))
+                            )}
+                        </select>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => fetchAudienceInsights()}
+                            disabled={!selectedAudienceEventId}
+                        >
+                            <i className="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                {loadingAudienceInsights ? (
+                    <div className="loading-state compact">
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <p>Analyzing likely audience segments...</p>
+                    </div>
+                ) : !selectedAudienceEventId ? (
+                    <div className="error-state compact">
+                        <i className="fas fa-info-circle"></i>
+                        <p>Create an upcoming event to view audience intelligence.</p>
+                    </div>
+                ) : audienceInsights ? (
+                    <>
+                        <div className="ai-audience-grid">
+                            <div className="ai-kpi-card">
+                                <p className="kpi-label">Total Candidates</p>
+                                <h4>{audienceInsights.audienceSummary?.totalCandidates || 0}</h4>
+                            </div>
+                            <div className="ai-kpi-card">
+                                <p className="kpi-label">High Intent</p>
+                                <h4>{audienceInsights.audienceSummary?.highIntent || 0}</h4>
+                            </div>
+                            <div className="ai-kpi-card">
+                                <p className="kpi-label">Medium Intent</p>
+                                <h4>{audienceInsights.audienceSummary?.mediumIntent || 0}</h4>
+                            </div>
+                            <div className="ai-kpi-card">
+                                <p className="kpi-label">Low Intent</p>
+                                <h4>{audienceInsights.audienceSummary?.lowIntent || 0}</h4>
+                            </div>
+                        </div>
+
+                        <div className="ai-audience-details">
+                            <div className="ai-audience-panel">
+                                <h4>Top Segments</h4>
+                                {audienceInsights.audienceSummary?.topSegments?.length ? (
+                                    <ul className="ai-segment-list">
+                                        {audienceInsights.audienceSummary.topSegments.map((segment) => (
+                                            <li key={segment.segment}>
+                                                <span>{segment.segment}</span>
+                                                <strong>{segment.count}</strong>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="empty-inline">No segment data yet</p>
+                                )}
+                            </div>
+
+                            <div className="ai-audience-panel wide">
+                                <h4>Top Candidate Users</h4>
+                                {audienceInsights.topCandidates?.length ? (
+                                    <div className="ai-candidate-table-wrap">
+                                        <table className="ai-candidate-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Industry</th>
+                                                    <th>Score</th>
+                                                    <th>Profile Match</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {audienceInsights.topCandidates.slice(0, 8).map((candidate) => (
+                                                    <tr key={candidate.userId}>
+                                                        <td>{candidate.name}</td>
+                                                        <td>{candidate.industry || 'N/A'}</td>
+                                                        <td>{candidate.score}</td>
+                                                        <td>{candidate.profileMatch}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <p className="empty-inline">No candidate ranking data yet</p>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="error-state compact">
+                        <i className="fas fa-chart-pie"></i>
+                        <p>Audience insights are not available yet.</p>
+                    </div>
+                )}
             </div>
 
             {/* Revenue Chart */}
@@ -2135,7 +2403,7 @@ ${selectedEngagementEvent.title},${data.totalConnections || 0},${data.pendingCon
                                 <h4>{event.title}</h4>
                                 <p>{new Date(event.date).toLocaleDateString()}</p>
                                 <div className="event-stats">
-                                    <span><i className="fas fa-users"></i> {event.registrations?.length || 0} attended</span>
+                                    <span><i className="fas fa-users"></i> {(event.totalTicketsSold || event.registrationCount || event.registrations?.length || 0)} attended</span>
                                     <span><i className="fas fa-star"></i> {event.averageRating || 'N/A'}</span>
                                 </div>
                             </div>

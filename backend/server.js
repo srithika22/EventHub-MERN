@@ -110,6 +110,7 @@ app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/activity', require('./routes/activity'));
 app.use('/api/recommendations', require('./routes/recommendations'));
+app.use('/api/event-reviews', require('./routes/event-reviews'));
 
 const PORT = process.env.PORT || 3001;
 
