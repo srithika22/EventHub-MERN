@@ -68,15 +68,33 @@ app.use(cors({
 app.use(express.json());
 
 // --- DATABASE CONNECTION ---
-mongoose.connect(process.env.MONGO_URI, {
-  serverSelectionTimeoutMS: 10000,
-  socketTimeoutMS: 45000,
-  maxPoolSize: 10,
-  retryWrites: true,
-  w: 'majority'
-})
-  .then(() => console.log('✅ Successfully connected to MongoDB Atlas!'))
-  .catch((error) => console.error('❌ MongoDB connection error:', error));
+async function startServer() {
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+  if (!mongoUri) {
+    console.error('❌ MongoDB URI is missing. Set MONGO_URI or MONGODB_URI in the backend environment before starting the server.');
+    process.exit(1);
+  }
+
+  try {
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      retryWrites: true,
+      w: 'majority'
+    });
+
+    console.log('✅ Successfully connected to MongoDB Atlas!');
+
+    server.listen(PORT, () => {
+      console.log(`🚀 Server is listening on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    process.exit(1);
+  }
+}
 
 // --- API ROUTES ---
 app.use('/api/auth', authRoutes);
@@ -90,6 +108,8 @@ app.use('/api/polling', require('./routes/polling'));
 app.use('/api/speakers', require('./routes/speakers'));
 app.use('/api/sessions', require('./routes/sessions'));
 app.use('/api/messages', require('./routes/messages'));
+app.use('/api/activity', require('./routes/activity'));
+app.use('/api/recommendations', require('./routes/recommendations'));
 
 const PORT = process.env.PORT || 3001;
 
@@ -237,6 +257,4 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json(payload);
 });
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server is listening on http://localhost:${PORT}`);
-});
+startServer();
