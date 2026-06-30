@@ -4,6 +4,11 @@ import { API_BASE_URL } from '../utils/api';
 
 const AuthContext = createContext(null);
 
+const normalizeToken = (value) => {
+  if (!value) return '';
+  return value.replace(/^Bearer\s+/i, '').trim();
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
@@ -24,7 +29,9 @@ export const AuthProvider = ({ children }) => {
       const currentToken = localStorage.getItem('token');
       if (currentToken) {
         // Make sure we always have the latest token, even if it changed
-        config.headers.Authorization = currentToken;
+        config.headers.Authorization = currentToken.startsWith('Bearer ')
+          ? currentToken
+          : `Bearer ${currentToken}`;
         console.log("Request with auth token:", currentToken);
       } else {
         console.log("Request without auth token");
@@ -50,14 +57,15 @@ export const AuthProvider = ({ children }) => {
       
       if (loginResponse.status === 200 && data.token) {
         console.log("Login successful, token received:", data.token);
+        const storedToken = normalizeToken(data.token);
         
         // Store authentication data
         localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', storedToken);
         
         // Update state
         setUser(data.user);
-        setToken(data.token);
+        setToken(storedToken);
         setIsAuthenticated(true);
         
         console.log("Authentication state updated:", data.user);
@@ -79,11 +87,12 @@ export const AuthProvider = ({ children }) => {
   const login = (userData, userToken) => {
     // Log the token we're storing to debug
     console.log("Storing auth token manually:", userToken);
+    const storedToken = normalizeToken(userToken);
     
     localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('token', userToken);
+    localStorage.setItem('token', storedToken);
     setUser(userData);
-    setToken(userToken);
+    setToken(storedToken);
     setIsAuthenticated(true);
   };
 
